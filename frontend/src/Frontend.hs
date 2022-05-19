@@ -28,20 +28,46 @@ frontend = Frontend
       el "title" $ text "Obelisk Minimal Example"
       elAttr "link" ("href" =: $(static "main.css") <> "type" =: "text/css" <> "rel" =: "stylesheet") blank
   , _frontend_body = do
-      el "h1" $ text "Welcome to Obelisk!"
-      el "p" $ text $ T.pack commonStuff
+      -- elAttr "h1" ("class" =: "title") $ text "Welcome to Obelisk!"
+      -- el "p" $ text $ T.pack commonStuff
       
-      -- `prerender` and `prerender_` let you choose a widget to run on the server
-      -- during prerendering and a different widget to run on the client with
-      -- JavaScript. The following will generate a `blank` widget on the server and
-      -- print "Hello, World!" on the client.
-      prerender_ blank $ liftJSM $ void $ eval ("console.log('Hello, World!')" :: T.Text)
+      -- -- `prerender` and `prerender_` let you choose a widget to run on the server
+      -- -- during prerendering and a different widget to run on the client with
+      -- -- JavaScript. The following will generate a `blank` widget on the server and
+      -- -- print "Hello, World!" on the client.
+      -- prerender_ blank $ liftJSM $ void $ eval ("console.log('Hello, World!')" :: T.Text)
 
-      elAttr "img" ("src" =: $(static "obelisk.jpg")) blank
-      el "div" $ do
-        exampleConfig <- getConfig "common/example"
-        case exampleConfig of
-          Nothing -> text "No config file found in config/common/example"
-          Just s -> text $ T.decodeUtf8 s
-      return ()
+      -- elAttr "img" ("src" =: $(static "obelisk.jpg")) blank
+      -- el "div" $ do
+      --   exampleConfig <- getConfig "common/example"
+      --   case exampleConfig of
+      --     Nothing -> text "No config file found in config/common/example"
+      --     Just s -> text $ T.decodeUtf8 s
+      -- return ()
+
+      elAttr "header" ("class" =: "header") $ do
+          el "nav" $ do
+            elAttr "a" ("href" =: "/" <> "class" =: "logo") $ do
+              elAttr "span" ("class" =: "super") $ text "Super "
+              elAttr "span" ("class" =: "imagem") $ text "IMAGEM"
+            el "ul" $ do 
+              el "li" $ do
+                elAttr "a" ("href" =: "https://www.google.com.br") $ text "Ver exames"
+              el "li" $ do
+                elAttr "a" ("href" =: "https://www.google.com.br") $ text "Cadastrar exames"
+
+      elAttr "main" ("class" =: "main") $ do
+        elAttr "h1" ("class" =: "title") $ text "AGENDE SEU EXAME"
+        elAttr "div" ("class" =: "content") $ do
+          elAttr "div" ("class" =: "banner") $ do
+            elAttr "div" ("class" =: "banner-text") $ do
+              el "p" $ text "A SUPER IMAGEM é mais praticidade para você. Profissionais capacitados, dias e horários flexíveis, equipamento de alta tecnologia e agendamento/resultados online. Além disso, atendemos a grande maioria dos convênios médicos."
+              el "p" $ text "Tudo isso garante nossa excelência no atendimento e na qualidade dos exames."
+            elAttr "div" ("class" =: "banner-image") $ do
+              elAttr "img" ("src" =: "https://blog.sst.com.br/wp-content/uploads/2015/08/exames_medicos_ocupacionais-640x400.jpg") blank
+          elAttr "div" ("class" =: "banner-reverse") $ do
+            elAttr "div" ("class" =: "banner-text") $ do
+              el "p" $ text "A SUPER IMAGEM acredita no atendimento de qualidade para todas as pessoas independente da classe social. Por isso, oferecemos a população o programa Social, que oferece valores diferenciados para pacientes com guia médica do SUS ou que possuam renda mensal de até 1 ½ salário mínimo por pessoa da família.  Entre em contato conosco e confira mais detalhes do programa."
+            elAttr "div" ("class" =: "banner-image") $ do
+              elAttr "img" ("src" =: "http://www.centroimagempi.com.br/wp-content/uploads/2016/09/exame-idosa.jpg") blank
   }
