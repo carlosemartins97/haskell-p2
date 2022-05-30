@@ -1,6 +1,9 @@
-#Projeto front-end utilizando Haskell
+# Projeto front-end utilizando Haskell
 
-##Alunos:
-Carlos Eduardo Martins
-Henrique Marchioni
-Cyro Fernandes
+## Professor:
+- Alexandre Garcia
+
+## Alunos:
+- Carlos Eduardo Martins
+- Henrique Marchioni
+- Cyro Fernandes
