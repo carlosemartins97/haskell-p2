@@ -110,6 +110,10 @@ a {
   width: 100%;
 }
 
+.content .banner {
+  margin-bottom: 32px;
+}
+
 .content .banner,
 .content .banner-reverse {
   display: flex;
@@ -138,10 +142,10 @@ a {
 
 .content .banner .banner-image,
 .content .banner-reverse .banner-image {
-  border-top-left-radius: 48px;
-  border-bottom-right-radius: 48px;
+  border-top-right-radius: 48px;
+  border-bottom-left-radius: 48px;
   border: 1px solid #ec7000;
-  height: 400px;
+  height: 300px;
 }
 
 .content .banner .banner-image img,
