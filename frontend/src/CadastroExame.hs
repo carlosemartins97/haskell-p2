@@ -42,22 +42,22 @@ frontend = Frontend
 
       elAttr "main" ("class" =: "main") $ do
         elAttr "h1" ("class" =: "title") $ text "CADASTRE UM EXAME"
-        elAttr "div" ("class" =: "content") $ do
-          elAttr "form" ("method" =: "POST" <> "action" =: "#") $ do
-            elAttr "div" ("class" =: "input-container") $ do
-              divClass "input-group" $ do
-                elAttr "label" ("class" =: "input-label") $ text "Código do exame"
-              -- elAttr "input" ("type" =: "text" <> "id" =: "codigo" <> "name" =: "codigo")
+        
+      elAttr "form" ("method" =: "POST" <> "action" =: "#" <> "class" =: "exame-form") $ do
+        elAttr "div" ("class" =: "input-container") $ do
+          divClass "input-group" $ do
+            elAttr "label" ("class" =: "input-label" <> "for" =: "codigo") $ text "Código do exame"
+            elAttr "input" ("type" =: "text" <> "id" =: "codigo" <> "name" =: "codigo") $ blank
 
-              divClass "input-group" $ do
-                elAttr "label" ("class" =: "input-label" <> "for" =: "exame") $ text "Nome do exame"
-              -- elAttr "input" ("type" =: "text" <> "id" =: "exame" <> "name" =: "exame")
+          divClass "input-group" $ do
+            elAttr "label" ("class" =: "input-label" <> "for" =: "exame") $ text "Nome do exame"
+            elAttr "input" ("type" =: "text" <> "id" =: "exame" <> "name" =: "exame") $ blank
 
-              divClass "input-group" $ do
-                elAttr "label" ("class" =: "input-label" <> "for" =: "valor") $ text "Valor do exame"
-              -- elAttr "input" ("type" =: "number" <> "id" =: "valor" <> "name" =: "valor")
-          elAttr "div" ("class" =: "btn-container") $ do
-            elAttr "button" ("type" =: "submit" <> "class" =: "submit") $ text "Cadastrar"
+          divClass "input-group" $ do
+            elAttr "label" ("class" =: "input-label" <> "for" =: "valor") $ text "Valor do exame"
+            elAttr "input" ("type" =: "number" <> "id" =: "valor" <> "name" =: "valor") $ blank 
+        elAttr "div" ("class" =: "btn-container") $ do
+          elAttr "button" ("type" =: "submit" <> "class" =: "submit") $ text "Cadastrar"
           
           --FINALIZAR FORMULARIOS
           
