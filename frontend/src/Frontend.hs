@@ -34,24 +34,70 @@ frontend = Frontend
             elAttr "a" ("href" =: "/" <> "class" =: "logo") $ do
               elAttr "span" ("class" =: "super") $ text "Super "
               elAttr "span" ("class" =: "imagem") $ text "IMAGEM"
-            el "ul" $ do 
-              el "li" $ do
-                elAttr "a" ("href" =: "https://www.google.com.br") $ text "Ver exames"
-              el "li" $ do
-                elAttr "a" ("href" =: "https://www.google.com.br") $ text "Cadastrar exames"
-
-      elAttr "main" ("class" =: "main") $ do
-        elAttr "h1" ("class" =: "title") $ text "AGENDE SEU EXAME"
-        elAttr "div" ("class" =: "content") $ do
-          elAttr "div" ("class" =: "banner") $ do
-            elAttr "div" ("class" =: "banner-text") $ do
-              el "p" $ text "A SUPER IMAGEM é mais praticidade para você. Profissionais capacitados, dias e horários flexíveis, equipamento de alta tecnologia e agendamento/resultados online. Além disso, atendemos a grande maioria dos convênios médicos."
-              el "p" $ text "Tudo isso garante nossa excelência no atendimento e na qualidade dos exames."
-            elAttr "div" ("class" =: "banner-image") $ do
-              elAttr "img" ("src" =: "https://blog.sst.com.br/wp-content/uploads/2015/08/exames_medicos_ocupacionais-640x400.jpg") blank
-          elAttr "div" ("class" =: "banner-reverse") $ do
-            elAttr "div" ("class" =: "banner-text") $ do
-              el "p" $ text "A SUPER IMAGEM acredita no atendimento de qualidade para todas as pessoas independente da classe social. Por isso, oferecemos a população o programa Social, que oferece valores diferenciados para pacientes com guia médica do SUS ou que possuam renda mensal de até 1 ½ salário mínimo por pessoa da família.  Entre em contato conosco e confira mais detalhes do programa."
-            elAttr "div" ("class" =: "banner-image") $ do
-              elAttr "img" ("src" =: "http://www.centroimagempi.com.br/wp-content/uploads/2016/09/exame-idosa.jpg") blank
+            el "div" $ do menuLi
+      elAttr "div" ("class" =: "conteudo") $ do mainPag
+      elAttr "script" ("src" =: $(static "main.js")) blank
   }
+
+homePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+homePage = do
+  elAttr "main" ("class" =: "main") $ do
+    elAttr "h1" ("class" =: "title") $ text "AGENDE SEU EXAME"
+    elAttr "div" ("class" =: "content") $ do
+      elAttr "div" ("class" =: "banner") $ do
+        elAttr "div" ("class" =: "banner-text") $ do
+          el "p" $ text "A SUPER IMAGEM é mais praticidade para você. Profissionais capacitados, dias e horários flexíveis, equipamento de alta tecnologia e agendamento/resultados online. Além disso, atendemos a grande maioria dos convênios médicos."
+          el "p" $ text "Tudo isso garante nossa excelência no atendimento e na qualidade dos exames."
+        elAttr "div" ("class" =: "banner-image") $ do
+          elAttr "img" ("src" =: "https://blog.sst.com.br/wp-content/uploads/2015/08/exames_medicos_ocupacionais-640x400.jpg") blank
+      elAttr "div" ("class" =: "banner-reverse") $ do
+        elAttr "div" ("class" =: "banner-text") $ do
+          el "p" $ text "A SUPER IMAGEM acredita no atendimento de qualidade para todas as pessoas independente da classe social. Por isso, oferecemos a população o programa Social, que oferece valores diferenciados para pacientes com guia médica do SUS ou que possuam renda mensal de até 1 ½ salário mínimo por pessoa da família.  Entre em contato conosco e confira mais detalhes do programa."
+        elAttr "div" ("class" =: "banner-image") $ do
+          elAttr "img" ("src" =: "http://www.centroimagempi.com.br/wp-content/uploads/2016/09/exame-idosa.jpg") blank
+
+formPage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+formPage = do
+  elAttr "main" ("class" =: "main") $ do
+    elAttr "h1" ("class" =: "title") $ text "CADASTRE SEU EXAME"
+    elAttr "form" ("method" =: "POST" <> "action" =: "#" <> "class" =: "exame-form") $ do
+      elAttr "div" ("class" =: "input-container") $ do
+        divClass "input-group" $ do
+          elAttr "label" ("class" =: "input-label" <> "for" =: "codigo") $ text "Código do exame"
+          elAttr "input" ("type" =: "text" <> "id" =: "codigo" <> "name" =: "codigo") $ blank
+
+        divClass "input-group" $ do
+          elAttr "label" ("class" =: "input-label" <> "for" =: "exame") $ text "Nome do exame"
+          elAttr "input" ("type" =: "text" <> "id" =: "exame" <> "name" =: "exame") $ blank
+
+        divClass "input-group" $ do
+          elAttr "label" ("class" =: "input-label" <> "for" =: "valor") $ text "Valor do exame"
+          elAttr "input" ("type" =: "number" <> "id" =: "valor" <> "name" =: "valor") $ blank 
+      elAttr "div" ("class" =: "btn-container") $ do
+        elAttr "button" ("type" =: "submit" <> "class" =: "submit") $ text "Cadastrar"
+
+data Pagina = Pagina1 | Pagina2
+
+clickLi :: DomBuilder t m => Pagina -> T.Text -> m (Event t Pagina)
+clickLi p t = do
+  (ev, _) <- el' "li" (elAttr "a" ("href" =: "#"  <> "id" =: (t)) (text t))
+  return ((\_ -> p) <$> domEvent Click ev)
+
+menuLi :: (DomBuilder t m, MonadHold t m) => m (Dynamic t Pagina)
+menuLi = do
+  evs <- el "ul" $ do
+    p1 <- clickLi Pagina1 "Home"
+    p2 <- clickLi Pagina2 "Cadastrar"
+    return (leftmost [p1,p2])
+  holdDyn Pagina1 evs
+
+currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m) => Pagina -> m ()
+currPag p =
+  case p of
+    Pagina1 -> homePage
+    Pagina2 -> formPage
+
+mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m) => m ()
+mainPag = do
+  pag <- el "div" menuLi
+  dyn_ $ currPag <$> pag
