@@ -42,7 +42,7 @@ frontend = Frontend
 homePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
 homePage = do
   elAttr "main" ("class" =: "main") $ do
-    elAttr "h1" ("class" =: "title") $ text "AGENDE SEU EXAME"
+    elAttr "h1" ("class" =: "title") $ text "AGENDAMENTOS"
     elAttr "div" ("class" =: "content") $ do
       elAttr "div" ("class" =: "banner") $ do
         elAttr "div" ("class" =: "banner-text") $ do
@@ -76,7 +76,39 @@ formPage = do
       elAttr "div" ("class" =: "btn-container") $ do
         elAttr "button" ("type" =: "submit" <> "class" =: "submit") $ text "Cadastrar"
 
-data Pagina = Pagina1 | Pagina2
+examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+examePage = do
+  elAttr "main" ("class" =: "main") $ do
+  elAttr "h1" ("class" =: "title") $ text "EXAMES CADASTRADOS"
+  el "table" $ do
+    el "thead" $ do
+      el "th" $ do text "Código"
+      el "th" $ do text "Nome"
+      el "th" $ do text "Valor (R$)"
+    el "tbody" $ do
+      el "tr" $ do
+        el "td" $ do text "123"
+        el "td" $ do text "Exame de urina"
+        el "td" $ do text "50"
+      el "tr" $ do
+        el "td" $ do text "123"
+        el "td" $ do text "Exame de urina"
+        el "td" $ do text "50"
+      el "tr" $ do
+        el "td" $ do text "123"
+        el "td" $ do text "Exame de urina"
+        el "td" $ do text "50"
+      el "tr" $ do
+        el "td" $ do text "123"
+        el "td" $ do text "Exame de urina"
+        el "td" $ do text "50"
+      el "tr" $ do
+        el "td" $ do text "123"
+        el "td" $ do text "Exame de urina"
+        el "td" $ do text "50"
+
+
+data Pagina = Pagina1 | Pagina2 | Pagina3
 
 clickLi :: DomBuilder t m => Pagina -> T.Text -> m (Event t Pagina)
 clickLi p t = do
@@ -85,10 +117,11 @@ clickLi p t = do
 
 menuLi :: (DomBuilder t m, MonadHold t m) => m (Dynamic t Pagina)
 menuLi = do
-  evs <- el "ul" $ do
+  evs <- elAttr "ul" ("class" =: "menulist") $ do
     p1 <- clickLi Pagina1 "Home"
     p2 <- clickLi Pagina2 "Cadastrar"
-    return (leftmost [p1,p2])
+    p3 <- clickLi Pagina3 "Exames"
+    return (leftmost [p1,p2,p3])
   holdDyn Pagina1 evs
 
 currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m) => Pagina -> m ()
@@ -96,6 +129,7 @@ currPag p =
   case p of
     Pagina1 -> homePage
     Pagina2 -> formPage
+    Pagina3 -> examePage
 
 mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m) => m ()
 mainPag = do

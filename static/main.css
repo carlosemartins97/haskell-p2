@@ -177,9 +177,29 @@ a {
   text-transform: uppercase;
   font-size: 18px;
   border-radius: 4px;
+  cursor: pointer;
 }
 
-.conteudo #Home,
-.conteudo #Cadastrar {
+.menulist {
   display: none;
+}
+
+table {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+table tbody tr:nth-child(2n + 1) {
+  background: #ec7000;
+  color: white;
+}
+
+table td,
+table th {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
 }
