@@ -165,6 +165,13 @@ a {
   height: 48px;
   border: 1px solid #aaa;
   border-radius: 4px;
+  padding: 0 16px;
+}
+
+.input-container label {
+  margin-bottom: 4px;
+  display: block;
+  font-weight: bold;
 }
 
 .input-container button {

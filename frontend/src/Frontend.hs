@@ -37,7 +37,7 @@ req :: ( DomBuilder t m, Prerender t m) => m ()
 req = do
     divClass "input-container" $ do
       divClass "input-group" $ do
-        elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Nome do exame"
+        elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Nome do exame:"
         inputEl <- inputElement def
         (submitBtn,_) <- el' "button" $ (text "Cadastrar")
         let click = domEvent Click submitBtn

@@ -18,6 +18,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const element = document.querySelector(`.conteudo #${id}`);
       simulateClick(element);
+
+      setTimeout(() => {
+        id === "Cadastrar" &&
+          document
+            .querySelector(".input-group input")
+            .setAttribute("placeholder", "Ex: exame de sangue");
+      }, 100);
     });
   });
 });
