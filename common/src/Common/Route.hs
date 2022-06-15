@@ -9,6 +9,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+
 module Common.Route where
 
 {- -- You will probably want these imports for composing Encoders.
@@ -16,17 +17,29 @@ import Prelude hiding (id, (.))
 import Control.Category
 -}
 
-import Data.Text (Text)
-import Data.Functor.Identity
 
+import Data.Functor.Identity
+import Data.Text (Text, unpack)
+import Data.Function
 import Obelisk.Route
 import Obelisk.Route.TH
+
+
+
+checFullREnc :: Encoder Identity Identity (R (FullRoute BackendRoute FrontendRoute)) PageName
+checFullREnc = checkEncoder fullRouteEncoder & 
+    \case 
+          Left err -> error $ unpack err
+          Right encoder -> encoder
+
 
 data BackendRoute :: * -> * where
   -- | Used to handle unparseable routes.
   BackendRoute_Missing :: BackendRoute ()
-  -- You can define any routes that will be handled specially by the backend here.
-  -- i.e. These do not serve the frontend, but do something different, such as serving static files.
+  BackendRoute_Exame  :: BackendRoute ()   -- rota exame
+
+
+
 
 data FrontendRoute :: * -> * where
   FrontendRoute_Main :: FrontendRoute ()
@@ -37,9 +50,14 @@ fullRouteEncoder
 fullRouteEncoder = mkFullRouteEncoder
   (FullRoute_Backend BackendRoute_Missing :/ ())
   (\case
-      BackendRoute_Missing -> PathSegment "missing" $ unitEncoder mempty)
+      BackendRoute_Missing -> PathSegment "missing" $ unitEncoder mempty
+      BackendRoute_Exame -> PathSegment "exame" $ unitEncoder mempty
+      
+    ) --cliente é a rota
   (\case
       FrontendRoute_Main -> PathEnd $ unitEncoder mempty)
+
+
 
 concat <$> mapM deriveRouteComponent
   [ ''BackendRoute
