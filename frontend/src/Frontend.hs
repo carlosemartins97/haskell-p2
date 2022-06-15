@@ -35,14 +35,17 @@ nomeRequest s = postJson getPath (Exame s)
 
 req :: ( DomBuilder t m, Prerender t m) => m ()
 req = do
-    inputEl <- inputElement def
-    (submitBtn,_) <- el' "button" (text "Inserir")
-    let click = domEvent Click submitBtn
-    let nm = tag (current $ _inputElement_value inputEl) click
-    _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
-      (pure never)
-      (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
-    return ()
+    divClass "input-container" $ do
+      divClass "input-group" $ do
+        elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Nome do exame"
+        inputEl <- inputElement def
+        (submitBtn,_) <- el' "button" $ (text "Cadastrar")
+        let click = domEvent Click submitBtn
+        let nm = tag (current $ _inputElement_value inputEl) click
+        _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
+          (pure never)
+          (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
+        return ()
 
 --------------------------------------------------------------------------------
 
@@ -69,7 +72,6 @@ frontend = Frontend
             el "div" $ do menuLi
       elAttr "div" ("class" =: "conteudo") $ do mainPag
       elAttr "script" ("src" =: $(static "main.js")) blank
-      req --- Chamada do input
   }
 
 homePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
@@ -89,25 +91,11 @@ homePage = do
         elAttr "div" ("class" =: "banner-image") $ do
           elAttr "img" ("src" =: "http://www.centroimagempi.com.br/wp-content/uploads/2016/09/exame-idosa.jpg") blank
 
-formPage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+formPage :: (DomBuilder t m, PostBuild t m, MonadHold t m, Prerender t m) => m ()
 formPage = do
   elAttr "main" ("class" =: "main") $ do
     elAttr "h1" ("class" =: "title") $ text "CADASTRE SEU EXAME"
-    elAttr "form" ("method" =: "POST" <> "action" =: "#" <> "class" =: "exame-form") $ do
-      elAttr "div" ("class" =: "input-container") $ do
-        divClass "input-group" $ do
-          elAttr "label" ("class" =: "input-label" <> "for" =: "codigo") $ text "Código do exame"
-          elAttr "input" ("type" =: "text" <> "id" =: "codigo" <> "name" =: "codigo") $ blank
-
-        divClass "input-group" $ do
-          elAttr "label" ("class" =: "input-label" <> "for" =: "exame") $ text "Nome do exame"
-          elAttr "input" ("type" =: "text" <> "id" =: "exame" <> "name" =: "exame") $ blank
-
-        divClass "input-group" $ do
-          elAttr "label" ("class" =: "input-label" <> "for" =: "valor") $ text "Valor do exame"
-          elAttr "input" ("type" =: "number" <> "id" =: "valor" <> "name" =: "valor") $ blank 
-      elAttr "div" ("class" =: "btn-container") $ do
-        elAttr "button" ("type" =: "submit" <> "class" =: "submit") $ text "Cadastrar"
+    req -- chamada do input
 
 examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
 examePage = do
@@ -157,14 +145,14 @@ menuLi = do
     return (leftmost [p1,p2,p3])
   holdDyn Pagina1 evs
 
-currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m) => Pagina -> m ()
+currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, Prerender t m) => Pagina -> m ()
 currPag p =
   case p of
     Pagina1 -> homePage
     Pagina2 -> formPage
     Pagina3 -> examePage
 
-mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m) => m ()
+mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, Prerender t m) => m ()
 mainPag = do
   pag <- el "div" menuLi
   dyn_ $ currPag <$> pag
