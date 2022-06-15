@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Frontend where
 
@@ -17,6 +18,37 @@ import Reflex.Dom.Core
 
 import Common.Api
 import Common.Route
+
+
+
+
+
+
+
+getPath :: T.Text
+getPath = renderBackendRoute checFullREnc $ BackendRoute_Exame :/ ()
+
+nomeRequest :: T.Text -> XhrRequest T.Text
+nomeRequest s = postJson getPath (Exame s)
+
+----------------------------- Evento do post para cadastro
+
+req :: ( DomBuilder t m, Prerender t m) => m ()
+req = do
+    inputEl <- inputElement def
+    (submitBtn,_) <- el' "button" (text "Inserir")
+    let click = domEvent Click submitBtn
+    let nm = tag (current $ _inputElement_value inputEl) click
+    _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
+      (pure never)
+      (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
+    return ()
+
+--------------------------------------------------------------------------------
+
+
+
+
 
 
 -- This runs in a monad that can be run on the client or the server.
@@ -37,6 +69,7 @@ frontend = Frontend
             el "div" $ do menuLi
       elAttr "div" ("class" =: "conteudo") $ do mainPag
       elAttr "script" ("src" =: $(static "main.js")) blank
+      req --- Chamada do input
   }
 
 homePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()

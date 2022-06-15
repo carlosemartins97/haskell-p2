@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Frontend where
 
@@ -19,6 +20,12 @@ import Common.Api
 import Common.Route
 
 
+
+
+
+
+
+
 -- This runs in a monad that can be run on the client or the server.
 -- To run code in a pure client or pure server context, use one of the
 -- `prerender` functions.
@@ -29,6 +36,7 @@ frontend = Frontend
       elAttr "link" ("href" =: $(static "main.css") <> "type" =: "text/css" <> "rel" =: "stylesheet") blank
       elAttr "meta" ("name" =: "viewport" <> "content" =: "width=device-width, initial-scale=1.0") blank
   , _frontend_body = do
+      
       elAttr "header" ("class" =: "header") $ do
           el "nav" $ do
             elAttr "a" ("href" =: "/" <> "class" =: "logo") $ do
