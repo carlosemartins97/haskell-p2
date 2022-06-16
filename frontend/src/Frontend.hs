@@ -20,11 +20,6 @@ import Common.Api
 import Common.Route
 
 
-
-
-
-
-
 getPath :: T.Text
 getPath = renderBackendRoute checFullREnc $ BackendRoute_Exame :/ ()
 
@@ -39,7 +34,7 @@ req = do
       divClass "input-group" $ do
         elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Nome do exame:"
         inputEl <- inputElement def
-        (submitBtn,_) <- el' "button" $ (text "Cadastrar")
+        (submitBtn,_) <- elAttr' "button" ("id" =: "cadastra-exame") $ (text "Cadastrar")
         let click = domEvent Click submitBtn
         let nm = tag (current $ _inputElement_value inputEl) click
         _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
@@ -48,10 +43,6 @@ req = do
         return ()
 
 --------------------------------------------------------------------------------
-
-
-
-
 
 
 -- This runs in a monad that can be run on the client or the server.
@@ -100,36 +91,44 @@ formPage = do
 examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
 examePage = do
   elAttr "main" ("class" =: "main") $ do
-  elAttr "h1" ("class" =: "title") $ text "EXAMES CADASTRADOS"
-  el "table" $ do
-    el "thead" $ do
-      el "th" $ do text "Código"
-      el "th" $ do text "Nome"
-      el "th" $ do text "Valor (R$)"
-    el "tbody" $ do
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
+    elAttr "h1" ("class" =: "title") $ text "EXAMES CADASTRADOS"
+    el "table" $ do
+      el "thead" $ do
+        el "th" $ do text "Código"
+        el "th" $ do text "Nome"
+        el "th" $ do text "Valor (R$)"
+      el "tbody" $ do
+        el "tr" $ do
+          el "td" $ do text "123"
+          el "td" $ do text "Exame de urina"
+          el "td" $ do text "50"
+        el "tr" $ do
+          el "td" $ do text "123"
+          el "td" $ do text "Exame de urina"
+          el "td" $ do text "50"
+        el "tr" $ do
+          el "td" $ do text "123"
+          el "td" $ do text "Exame de urina"
+          el "td" $ do text "50"
+        el "tr" $ do
+          el "td" $ do text "123"
+          el "td" $ do text "Exame de urina"
+          el "td" $ do text "50"
+        el "tr" $ do
+          el "td" $ do text "123"
+          el "td" $ do text "Exame de urina"
+          el "td" $ do text "50"
 
 
-data Pagina = Pagina1 | Pagina2 | Pagina3
+sucessoPage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+sucessoPage = do
+  elAttr "main" ("class" =: "main") $ do
+    elAttr "h1" ("class" =: "title") $ text "EXAME CADASTRADO COM SUCESSO"
+    elAttr "button" ("type" =: "button" <> "id" =: "back") $ text "Lista de exames"
+
+
+
+data Pagina = Pagina1 | Pagina2 | Pagina3 | Pagina4
 
 clickLi :: DomBuilder t m => Pagina -> T.Text -> m (Event t Pagina)
 clickLi p t = do
@@ -142,7 +141,8 @@ menuLi = do
     p1 <- clickLi Pagina1 "Home"
     p2 <- clickLi Pagina2 "Cadastrar"
     p3 <- clickLi Pagina3 "Exames"
-    return (leftmost [p1,p2,p3])
+    p4 <- clickLi Pagina4 "sucesso"
+    return (leftmost [p1,p2,p3,p4])
   holdDyn Pagina1 evs
 
 currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, Prerender t m) => Pagina -> m ()
@@ -151,6 +151,7 @@ currPag p =
     Pagina1 -> homePage
     Pagina2 -> formPage
     Pagina3 -> examePage
+    Pagina4 -> sucessoPage
 
 mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, Prerender t m) => m ()
 mainPag = do
