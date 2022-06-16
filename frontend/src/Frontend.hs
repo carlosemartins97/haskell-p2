@@ -8,6 +8,7 @@
 module Frontend where
 
 import Control.Monad
+import Control.Monad.Fix
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Language.Javascript.JSaddle (eval, liftJSM)
@@ -25,39 +26,6 @@ import Data.Aeson
 
 
 
-
-
-
-
-
-
-
-{-  
-
-getPath :: T.Text
-getPath = renderBackendRoute checFullREnc $ BackendRoute_Exame :/ ()
-
-nomeRequest :: T.Text -> XhrRequest T.Text
-nomeRequest s = postJson getPath (Exame s)
-
------------------------------ Evento do post para cadastro
-
-req :: ( DomBuilder t m, Prerender t m) => m ()
-req = do
-    divClass "input-container" $ do
-      divClass "input-group" $ do
-        elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Nome do exame:"
-        inputEl <- inputElement def
-        (submitBtn,_) <- el' "button" $ (text "Cadastrar")
-        let click = domEvent Click submitBtn
-        let nm = tag (current $ _inputElement_value inputEl) click
-        _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
-          (pure never)
-          (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
-        return ()
-
---------------------------------------------------------------------------------
--}
 
 getPath :: R BackendRoute -> T.Text
 getPath p = renderBackendRoute checFullREnc p
@@ -92,10 +60,6 @@ reqExame = do
 
 
 
-
-
-
-
 numberInput :: (DomBuilder t m, Num a, Read a) => m (Dynamic t a)
 numberInput = do
       n <- inputElement $ def
@@ -104,6 +68,48 @@ numberInput = do
         . elementConfig_initialAttributes .~ ("type" =: "number")
       return $ fmap (fromMaybe 0 . readMaybe . T.unpack) 
                  (_inputElement_value n)
+
+
+------------------------------------------------------------------------------------------------
+
+
+
+getListReq :: XhrRequest ()
+getListReq = xhrRequest "GET" (getPath (BackendRoute_Listar :/ ())) def
+
+
+reqLista :: ( DomBuilder t m, Prerender t m, MonadHold t m, MonadFix m, PostBuild t m) => m ()
+reqLista = do
+  (btn, _) <- el' "button" (text "Listar")
+  let click = domEvent Click btn
+  exams :: Dynamic t (Event t (Maybe [Exame])) <- prerender
+    (pure never)
+    (fmap decodeXhrResponse <$> performRequestAsync (const getListReq <$> click))
+  dynP <- foldDyn (\ps d -> case ps of
+    Nothing -> []
+    Just p -> d++p) [] (switchDyn exams)
+  el "table" $ do
+    el "thead" $ do
+      el "tr" $ do
+        el "th" (text "Id")
+        el "th" (text "Nome")
+        el "th" (text "Valor")
+        el "th" (text "Idade mínima")
+    el "tbody" $ do
+      dyn_ (fmap sequence (ffor dynP (fmap tabExame)))
+
+
+
+
+tabExame :: DomBuilder t m => Exame -> m ()
+tabExame ex = do
+  el "tr" $ do
+    el "td" (text $ T.pack $ show $ cd_exame ex)
+    el "td" (text $ nm_exame ex)
+    el "td" (text $ T.pack $ show $ vl_exame ex)
+    el "td" (text $ T.pack $ show $ qt_exame ex)
+
+
 
 
 
@@ -151,37 +157,11 @@ formPage = do
     elAttr "h1" ("class" =: "title") $ text "CADASTRE SEU EXAME"
     reqExame -- chamada do input
 
-examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m, MonadFix m, Prerender t m) => m ()
 examePage = do
   elAttr "main" ("class" =: "main") $ do
   elAttr "h1" ("class" =: "title") $ text "EXAMES CADASTRADOS"
-  el "table" $ do
-    el "thead" $ do
-      el "th" $ do text "Código"
-      el "th" $ do text "Nome"
-      el "th" $ do text "Valor (R$)"
-    el "tbody" $ do
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-      el "tr" $ do
-        el "td" $ do text "123"
-        el "td" $ do text "Exame de urina"
-        el "td" $ do text "50"
-
+  reqLista
 
 data Pagina = Pagina1 | Pagina2 | Pagina3
 
@@ -199,14 +179,14 @@ menuLi = do
     return (leftmost [p1,p2,p3])
   holdDyn Pagina1 evs
 
-currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, Prerender t m) => Pagina -> m ()
+currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, MonadFix m, Prerender t m) => Pagina -> m ()
 currPag p =
   case p of
     Pagina1 -> homePage
     Pagina2 -> formPage
     Pagina3 -> examePage
 
-mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, Prerender t m) => m ()
+mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, MonadFix m, Prerender t m) => m ()
 mainPag = do
   pag <- el "div" menuLi
   dyn_ $ currPag <$> pag
