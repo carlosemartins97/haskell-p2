@@ -48,7 +48,7 @@ reqExame = do
         elAttr "label" ("class" =: "input-label" <> "for" =: "qt") $ text "idade minima:"
         qt_exame <- numberInput
         let exam = fmap (\((n,v),q) -> Exame 0 n v q) (zipDyn (zipDyn (_inputElement_value nm_exame) vl_exame) qt_exame)
-        (submitBtn,_) <- el' "button" (text "Inserir")
+        (submitBtn,_) <- elAttr' "button" ("id" =: "cadastra-exame") $ (text "Cadastrar")
         let click = domEvent Click submitBtn
         let examEvt = tag (current exam) click
         _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
@@ -80,23 +80,24 @@ getListReq = xhrRequest "GET" (getPath (BackendRoute_Listar :/ ())) def
 
 reqLista :: ( DomBuilder t m, Prerender t m, MonadHold t m, MonadFix m, PostBuild t m) => m ()
 reqLista = do
-  (btn, _) <- el' "button" (text "Listar")
-  let click = domEvent Click btn
-  exams :: Dynamic t (Event t (Maybe [Exame])) <- prerender
-    (pure never)
-    (fmap decodeXhrResponse <$> performRequestAsync (const getListReq <$> click))
-  dynP <- foldDyn (\ps d -> case ps of
-    Nothing -> []
-    Just p -> d++p) [] (switchDyn exams)
-  el "table" $ do
-    el "thead" $ do
-      el "tr" $ do
-        el "th" (text "Id")
-        el "th" (text "Nome")
-        el "th" (text "Valor")
-        el "th" (text "Idade mínima")
-    el "tbody" $ do
-      dyn_ (fmap sequence (ffor dynP (fmap tabExame)))
+  divClass "list-container" $ do
+    (btn, _) <- elAttr' "button" ("id" =: "lista-exame") $ (text "Listar")
+    let click = domEvent Click btn
+    exams :: Dynamic t (Event t (Maybe [Exame])) <- prerender
+      (pure never)
+      (fmap decodeXhrResponse <$> performRequestAsync (const getListReq <$> click))
+    dynP <- foldDyn (\ps d -> case ps of
+      Nothing -> []
+      Just p -> d++p) [] (switchDyn exams)
+    el "table" $ do
+      el "thead" $ do
+        el "tr" $ do
+          el "th" (text "Id")
+          el "th" (text "Nome")
+          el "th" (text "Valor")
+          el "th" (text "Idade mínima")
+      el "tbody" $ do
+        dyn_ (fmap sequence (ffor dynP (fmap tabExame)))
 
 
 
@@ -168,7 +169,6 @@ sucessoPage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
 sucessoPage = do
   elAttr "main" ("class" =: "main") $ do
     elAttr "h1" ("class" =: "title") $ text "EXAME CADASTRADO COM SUCESSO"
-    elAttr "button" ("type" =: "button" <> "id" =: "back") $ text "Lista de exames"
 
 
 

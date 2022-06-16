@@ -44,6 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }, 100);
       }
+
+      if (id === "Exames") {
+        const btnListar = document.querySelector("body");
+        console.log(btnListar);
+
+        setTimeout(() => {
+          const teste = btnListar.querySelector("button");
+          console.log(teste);
+          simulateClick(teste);
+        }, 50);
+        // simulateClick(btnListar);
+      }
     });
   });
 });
