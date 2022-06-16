@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE RecursiveDo #-}
+{-# LANGUAGE GADTs #-}
 
 module Frontend where
 
@@ -13,17 +16,23 @@ import Obelisk.Frontend
 import Obelisk.Configs
 import Obelisk.Route
 import Obelisk.Generated.Static
-
+import Text.Read
 import Reflex.Dom.Core
-
+import Data.Maybe
 import Common.Api
 import Common.Route
+import Data.Aeson
 
 
 
 
 
 
+
+
+
+
+{-  
 
 getPath :: T.Text
 getPath = renderBackendRoute checFullREnc $ BackendRoute_Exame :/ ()
@@ -48,8 +57,53 @@ req = do
         return ()
 
 --------------------------------------------------------------------------------
+-}
+
+getPath :: R BackendRoute -> T.Text
+getPath p = renderBackendRoute checFullREnc p
 
 
+sendRequest :: ToJSON a => R BackendRoute -> a -> XhrRequest T.Text
+sendRequest r dados = postJson (getPath r) dados
+
+
+
+reqExame :: ( DomBuilder t m , Prerender t m ) => m ()
+reqExame = do
+
+  divClass "input-container" $ do
+      divClass "input-group" $ do
+        elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Nome do exame:"
+        nm_exame <- inputElement def
+        elAttr "label" ("class" =: "input-label" <> "for" =: "valor") $ text "valor do exame:"
+        vl_exame <- numberInput
+        elAttr "label" ("class" =: "input-label" <> "for" =: "qt") $ text "idade minima:"
+        qt_exame <- numberInput
+        let exam = fmap (\((n,v),q) -> Exame 0 n v q) (zipDyn (zipDyn (_inputElement_value nm_exame) vl_exame) qt_exame)
+        (submitBtn,_) <- el' "button" (text "Inserir")
+        let click = domEvent Click submitBtn
+        let examEvt = tag (current exam) click
+        _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
+          (pure never)
+          (fmap decodeXhrResponse <$>
+            performRequestAsync (sendRequest (BackendRoute_Exame :/ ())
+              <$> examEvt))
+        return ()
+
+
+
+
+
+
+
+numberInput :: (DomBuilder t m, Num a, Read a) => m (Dynamic t a)
+numberInput = do
+      n <- inputElement $ def
+        & inputElementConfig_initialValue .~ "0"
+        & inputElementConfig_elementConfig 
+        . elementConfig_initialAttributes .~ ("type" =: "number")
+      return $ fmap (fromMaybe 0 . readMaybe . T.unpack) 
+                 (_inputElement_value n)
 
 
 
@@ -95,7 +149,7 @@ formPage :: (DomBuilder t m, PostBuild t m, MonadHold t m, Prerender t m) => m (
 formPage = do
   elAttr "main" ("class" =: "main") $ do
     elAttr "h1" ("class" =: "title") $ text "CADASTRE SEU EXAME"
-    req -- chamada do input
+    reqExame -- chamada do input
 
 examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
 examePage = do
