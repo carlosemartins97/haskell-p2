@@ -89,6 +89,7 @@ reqLista = do
     dynP <- foldDyn (\ps d -> case ps of
       Nothing -> []
       Just p -> d++p) [] (switchDyn exams)
+    el "div" $ do reqDelete
     el "table" $ do
       el "thead" $ do
         el "tr" $ do
@@ -109,7 +110,6 @@ tabExame ex = do
     el "td" (text $ nm_exame ex)
     el "td" (text $ T.pack $ show $ vl_exame ex)
     el "td" (text $ T.pack $ show $ qt_exame ex)
-    el "td" $ do reqDelete
 
 
 
@@ -126,14 +126,17 @@ nomeRequest s = postJson getPathDelete (Del s)
 
 reqDelete :: ( DomBuilder t m, Prerender t m) => m ()
 reqDelete = do
-  inputEl <- inputElement def
-  (submitBtn,_) <- el' "button" (text "Inserir")
-  let click = domEvent Click submitBtn
-  let nm = tag (current $ _inputElement_value inputEl) click
-  _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
-    (pure never)
-    (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
-  return ()
+  divClass "input-container apagar" $ do
+      divClass "input-group" $ do
+        elAttr "label" ("class" =: "input-label" <> "for" =: "nome") $ text "Digite o ID do campo a ser excluído:"
+        inputEl <- inputElement def
+        (submitBtn,_) <- elAttr' "button" ("id" =: "apagar") $ (text "Apagar")
+        let click = domEvent Click submitBtn
+        let nm = tag (current $ _inputElement_value inputEl) click
+        _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
+          (pure never)
+          (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
+        return ()
 
 
 
@@ -194,7 +197,7 @@ examePage = do
 sucessoPage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
 sucessoPage = do
   elAttr "main" ("class" =: "main") $ do
-    elAttr "h1" ("class" =: "title") $ text "EXAME CADASTRADO COM SUCESSO"
+    elAttr "h1" ("class" =: "title") $ text "AÇÃO REALIZADA COM SUCESSO"
 
 
 

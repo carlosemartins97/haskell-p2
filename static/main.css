@@ -230,3 +230,8 @@ button#back {
 #lista-exame {
   display: none;
 }
+
+.apagar {
+  margin-bottom: 32px;
+  max-width: 300px;
+}

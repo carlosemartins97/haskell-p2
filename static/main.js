@@ -53,7 +53,14 @@ document.addEventListener("DOMContentLoaded", function () {
           const teste = btnListar.querySelector("button");
           console.log(teste);
           simulateClick(teste);
-        }, 50);
+
+          document
+            .querySelector("button#apagar")
+            .addEventListener("click", function () {
+              const sucessoBtn = document.querySelector(`.conteudo #sucesso`);
+              simulateClick(sucessoBtn);
+            });
+        }, 100);
         // simulateClick(btnListar);
       }
     });
