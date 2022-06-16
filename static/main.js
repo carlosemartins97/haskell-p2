@@ -19,12 +19,31 @@ document.addEventListener("DOMContentLoaded", function () {
       const element = document.querySelector(`.conteudo #${id}`);
       simulateClick(element);
 
-      setTimeout(() => {
-        id === "Cadastrar" &&
+      if (id === "Cadastrar") {
+        setTimeout(() => {
+          id === "Cadastrar" &&
+            document
+              .querySelector(".input-group input")
+              .setAttribute("placeholder", "Ex: exame de sangue");
+
           document
-            .querySelector(".input-group input")
-            .setAttribute("placeholder", "Ex: exame de sangue");
-      }, 100);
+            .querySelector("button#cadastra-exame")
+            .addEventListener("click", function () {
+              const sucessoBtn = document.querySelector(`.conteudo #sucesso`);
+              simulateClick(sucessoBtn);
+
+              setTimeout(() => {
+                document
+                  .querySelector("button#back")
+                  .addEventListener("click", function () {
+                    const examesBtn =
+                      document.querySelector(`.conteudo #Exames`);
+                    simulateClick(examesBtn);
+                  });
+              }, 100);
+            });
+        }, 100);
+      }
     });
   });
 });

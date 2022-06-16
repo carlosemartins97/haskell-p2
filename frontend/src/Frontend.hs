@@ -160,10 +160,19 @@ formPage = do
 examePage :: (DomBuilder t m, PostBuild t m, MonadHold t m, MonadFix m, Prerender t m) => m ()
 examePage = do
   elAttr "main" ("class" =: "main") $ do
-  elAttr "h1" ("class" =: "title") $ text "EXAMES CADASTRADOS"
-  reqLista
+    elAttr "h1" ("class" =: "title") $ text "EXAMES CADASTRADOS"
+    reqLista
 
-data Pagina = Pagina1 | Pagina2 | Pagina3
+
+sucessoPage :: (DomBuilder t m, PostBuild t m, MonadHold t m) => m ()
+sucessoPage = do
+  elAttr "main" ("class" =: "main") $ do
+    elAttr "h1" ("class" =: "title") $ text "EXAME CADASTRADO COM SUCESSO"
+    elAttr "button" ("type" =: "button" <> "id" =: "back") $ text "Lista de exames"
+
+
+
+data Pagina = Pagina1 | Pagina2 | Pagina3 | Pagina4
 
 clickLi :: DomBuilder t m => Pagina -> T.Text -> m (Event t Pagina)
 clickLi p t = do
@@ -176,7 +185,8 @@ menuLi = do
     p1 <- clickLi Pagina1 "Home"
     p2 <- clickLi Pagina2 "Cadastrar"
     p3 <- clickLi Pagina3 "Exames"
-    return (leftmost [p1,p2,p3])
+    p4 <- clickLi Pagina4 "sucesso"
+    return (leftmost [p1,p2,p3,p4])
   holdDyn Pagina1 evs
 
 currPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, MonadFix m, Prerender t m) => Pagina -> m ()
@@ -185,6 +195,7 @@ currPag p =
     Pagina1 -> homePage
     Pagina2 -> formPage
     Pagina3 -> examePage
+    Pagina4 -> sucessoPage
 
 mainPag :: (DomBuilder t m, MonadHold t m, PostBuild t m, MonadFix m, Prerender t m) => m ()
 mainPag = do
