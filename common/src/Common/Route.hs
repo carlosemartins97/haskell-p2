@@ -37,6 +37,7 @@ data BackendRoute :: * -> * where
   -- | Used to handle unparseable routes.
   BackendRoute_Missing :: BackendRoute ()
   BackendRoute_Exame  :: BackendRoute ()   -- rota exame
+  BackendRoute_Listar :: BackendRoute ()
 
 
 
@@ -52,6 +53,7 @@ fullRouteEncoder = mkFullRouteEncoder
   (\case
       BackendRoute_Missing -> PathSegment "missing" $ unitEncoder mempty
       BackendRoute_Exame -> PathSegment "exame" $ unitEncoder mempty
+      BackendRoute_Listar -> PathSegment "listar" $ unitEncoder mempty
       
     ) --cliente é a rota
   (\case
