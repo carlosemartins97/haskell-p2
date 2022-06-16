@@ -38,6 +38,7 @@ data BackendRoute :: * -> * where
   BackendRoute_Missing :: BackendRoute ()
   BackendRoute_Exame  :: BackendRoute ()   -- rota exame
   BackendRoute_Listar :: BackendRoute ()
+  BackendRoute_Delete :: BackendRoute ()
 
 
 
@@ -54,6 +55,7 @@ fullRouteEncoder = mkFullRouteEncoder
       BackendRoute_Missing -> PathSegment "missing" $ unitEncoder mempty
       BackendRoute_Exame -> PathSegment "exame" $ unitEncoder mempty
       BackendRoute_Listar -> PathSegment "listar" $ unitEncoder mempty
+      BackendRoute_Delete -> PathSegment "delete" $ unitEncoder mempty
       
     ) --cliente é a rota
   (\case

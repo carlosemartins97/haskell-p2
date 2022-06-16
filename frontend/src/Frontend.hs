@@ -102,13 +102,39 @@ reqLista = do
 
 
 
-tabExame :: DomBuilder t m => Exame -> m ()
+tabExame :: (DomBuilder t m,  Prerender t m) => Exame -> m ()
 tabExame ex = do
   el "tr" $ do
     el "td" (text $ T.pack $ show $ cd_exame ex)
     el "td" (text $ nm_exame ex)
     el "td" (text $ T.pack $ show $ vl_exame ex)
     el "td" (text $ T.pack $ show $ qt_exame ex)
+    el "td" $ do reqDelete
+
+
+
+--------------------------------------------------------------
+
+
+getPathDelete :: T.Text
+getPathDelete = renderBackendRoute checFullREnc $ BackendRoute_Delete :/ ()
+
+
+nomeRequest :: T.Text -> XhrRequest T.Text
+nomeRequest s = postJson getPathDelete (Del s)
+
+
+reqDelete :: ( DomBuilder t m, Prerender t m) => m ()
+reqDelete = do
+  inputEl <- inputElement def
+  (submitBtn,_) <- el' "button" (text "Inserir")
+  let click = domEvent Click submitBtn
+  let nm = tag (current $ _inputElement_value inputEl) click
+  _ :: Dynamic t (Event t (Maybe T.Text)) <- prerender
+    (pure never)
+    (fmap decodeXhrResponse <$> performRequestAsync (nomeRequest <$> nm))
+  return ()
+
 
 
 

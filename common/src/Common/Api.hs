@@ -19,7 +19,7 @@ import Database.PostgreSQL.Simple
 -- tipo que represnta a tabela
 data Exame = Exame { cd_exame :: Int, nm_exame :: Text, vl_exame :: Double, qt_exame :: Int } deriving (Generic, ToJSON, FromJSON, ToRow, FromRow, Eq, Show)
 
-
+data Del = Del Text deriving (Generic, ToJSON, FromJSON)
 
 
 

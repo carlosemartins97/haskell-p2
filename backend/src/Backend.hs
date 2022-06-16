@@ -57,6 +57,12 @@ backend = Backend
                 query_ dbcon "SELECT * from exame"
             modifyResponse $ setResponseStatus 200 "OK"
             writeLazyText (encodeToLazyText res)
+          BackendRoute_Delete :/ () -> do
+            Just cd_exame <- A.decode <$> readRequestBody 2000
+            liftIO $ do
+              execute_ dbcon migration
+              execute dbcon "DELETE from exame WHERE (cd_exame) = (?)" [cd_exame :: Text]
+            modifyResponse $ setResponseStatus 200 "OK"
           _ -> return ()
           
   , _backend_routeEncoder = fullRouteEncoder
