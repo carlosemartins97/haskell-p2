@@ -1,4 +1,4 @@
-# Projeto front-end utilizando Haskell
+# Projeto utilizando Haskell + obelisk
 
 ## Professor:
 - Alexandre Garcia
